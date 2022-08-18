@@ -124,14 +124,48 @@ class Solution {
         return haystack.find(needle);
     }
 
+    // 459. 重复的子字符串
     bool repeatedSubstringPattern(string s) {
+        int end = 0;  // 闭区间
+        while (end < s.size() - 1 and s[end + 1] != s[0])
+            end++;
+        int left = 0, right = end + 1;
+        while (right < s.size()) {
+            if (s[right] != s[left]) {
+                left = 0;
+                right = end + 2;
+                while (right < s.size() and s[right] != s[0]) right++;
+                end = right - 1;
+            } else {
+                if ((right - end) % (end + 1) == 0) {
+                    if (right == s.size() - 1)
+                        return true;
+                    left = 0;
+                } else {
+                    left++;
+                }
+                right++;
+            }
+        }
+        return false;
+    }
 
+    bool repeatedSubstringPattern2(string s) {
+        // 判断 s + s (首尾除外)中是否存在 s
+        string s2(s.begin() + 1, s.end());
+        s2.append(s.begin(), s.end() - 1);
+        return s2.find(s) != string::npos;
+    }
+
+    bool repeatedSubstringPattern3(string s) {
+        // 类似KMP实现，暂时不做
+        return false;
     }
 };
 
 int main() {
     Solution solve;
-    string s = "hello  world";
-    print("[" + solve.reverseWords3(s) + "]");
+    string s = "aba";
+    print(solve.repeatedSubstringPattern(s));
     return 1;
 }

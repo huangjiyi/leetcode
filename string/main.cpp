@@ -118,10 +118,55 @@ class Solution {
     }
 
     // 28. 实现 strStr()
-    int strStr(string haystack, string needle) {
+    // https://leetcode.cn/problems/implement-strstr/
+    int strStr2(string haystack, string needle) {
         // 内置函数直接秒了
         // 或者自己写KMP
         return haystack.find(needle);
+    }
+
+    // 获取KMP算法中的next数组
+    vector<int> getNext(const string &needle) {
+        // 参考: https://www.zhihu.com/question/21923021
+        // k-前缀: 字符串的前 k 个字符, k-后缀: 字符串的后 k 个字符, k 必须小于字符串长度 (next[0] = 0)
+        // next[i]: P[0]~P[i]这一段字符串, 使得k-前缀恰等于k-后缀的最大的k.
+        // 维护左右两个指针, 右指针从1开始, 表示当前要计算next[i]的i，左指针则表示用来最大k-前缀的末尾下标
+        // 令 left = next[right-1], 这样 t 中前 left 个元素与 t[right] 左边 left 个元素相等 (根据 next[i] 定义)
+        // 比较 t[right] 和 t[left], 如果 t[right] == t[left], 则 next[right] = left + 1,
+        // 如果 t[right] != t[left], 则令 left = next[left], 继续比较 t[right] 和 t[left],
+        // 不断重复直到 left = 0, 还不相等就令 next[right] = 0
+        vector<int> next(needle.length(), 0);
+        int left = 0, right = 1;
+        while (right < needle.length()) {
+            if (needle[right] == needle[left])
+                next[right++] = left++ + 1;
+            else if (left)
+                left = next[left - 1];
+            else
+                right++;
+        }
+        return next;
+    }
+
+    // KMP字符串匹配算法
+    int strStr(const string &haystack, const string &needle) {
+        // 先获取模式串的 next 数组
+        // 后面匹配的逻辑与计算 next 数组时类似
+        auto next = getNext(needle);
+        int i = 0, cur = 0;
+        while (i < haystack.length()) {
+            if (haystack[i] == needle[cur]) {
+                i++;
+                cur++;
+            } else if (cur) {
+                cur = next[cur - 1];
+            } else {
+                i++;
+            }
+            if (cur == needle.length())
+                return i - cur;
+        }
+        return -1;
     }
 
     // 459. 重复的子字符串
@@ -158,14 +203,31 @@ class Solution {
     }
 
     bool repeatedSubstringPattern3(string s) {
-        // 类似KMP实现，暂时不做
-        return false;
+        // 利用 KMP 的 next 数组
+        // 观察由重复子串构成的字符串的 next 数组可以发现
+        // 假设 s 由 n 个最小重复子串 t 构成
+        // 那么 s 中 k-前缀和 k-后缀相等的最大 k 一定是 (n - 1) * t.length (因为 k 一定小宇 s.length)
+        // 即 k > 0 and k % (s.length - k) == 0
+        int next[s.size()];
+        int left = 0, right = 1;
+        while (right < s.length()) {
+            if (s[right] == s[left])
+                next[right++] = left++ + 1;
+            else if (left)
+                left = next[left - 1];
+            else {
+                next[right] = 0;
+                right++;
+            }
+        }
+        int k = next[s.size() - 1];
+        return k > 0 and k % (s.length() - k) == 0;
     }
 };
 
 int main() {
     Solution solve;
-    string s = "aba";
-    print(solve.repeatedSubstringPattern(s));
+    string s = "abac";
+    print(solve.repeatedSubstringPattern3(s));
     return 1;
 }

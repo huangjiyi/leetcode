@@ -8,4 +8,8 @@ include_directories(linklist)
 include_directories(stackNqueue)
 
 add_executable(algorithm
-        string/main.cpp)
+        test.cpp)
+
+add_executable(hash
+        hash/main.cpp
+        utils.h)

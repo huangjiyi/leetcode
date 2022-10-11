@@ -24,18 +24,16 @@ class Solution {
 
     // 383. 赎金信
     bool canConstruct(string ransomNote, string magazine) {
-        vector<int> appears(26);
-        for (const auto &ch: magazine) {
+        array<int, 26> appears{};
+        for (const auto &ch: magazine)
             appears[ch - 'a']++;
-        }
         for (const auto &ch: ransomNote) {
             if (appears[ch - 'a'])
                 appears[ch - 'a']--;
             else
                 return false;
         }
-        return all_of(appears.begin(), appears.end(),
-                      [](int p) { return p >= 0; });
+        return true;
     }
 
 
@@ -88,6 +86,89 @@ class Solution {
             appear[s[i + p.length()] - 'a']--;
             if (all_of(appear.begin(), appear.end(), [](const int &num) { return num == 0; }))
                 res.push_back(i + 1);
+        }
+        return res;
+    }
+
+    // 349. 两个数组的交集
+    vector<int> intersection(vector<int> &nums1, vector<int> &nums2) {
+        unordered_set<int> nums1_set(nums1.begin(), nums1.end());
+        vector<int> res{};
+        for (const int &num: nums2) {
+            if (nums1_set.count(num)) {
+                res.push_back(num);
+                nums1_set.erase(num);
+            }
+        }
+        return res;
+    }
+
+    // 350. 两个数组的交集 II
+    vector<int> intersect(vector<int> &nums1, vector<int> &nums2) {
+        unordered_map<int, int> nums1_appears;
+        for (const int &num: nums1) {
+            nums1_appears[num]++;
+        }
+        vector<int> res{};
+        for (const int &num: nums2) {
+            if (nums1_appears.count(num)) {
+                res.push_back(num);
+                nums1_appears[num]--;
+                if (nums1_appears[num] == 0)
+                    nums1_appears.erase(num);
+            }
+        }
+        return res;
+    }
+
+    // 202. 快乐数
+    int nextNum(int n) {
+        int res = 0;
+        while (n) {
+            res += pow(n % 10, 2);
+            n /= 10;
+        }
+        return res;
+    }
+
+    bool isHappy(int n) {
+        unordered_set<int> nums;
+        while (not nums.count(n)) {
+            nums.insert(n);
+            n = nextNum(n);
+            if (n == 1)
+                return true;
+        }
+        return false;
+    }
+
+    // 1. 两数之和
+    // 思路: 将数组中的数 num（key）及其索引（value）一个个插入哈希表中
+    // 每次插入 num 前判断 target - num 是否出现在哈希表中
+    vector<int> twoSum(vector<int> &nums, int target) {
+        unordered_map<int, int> num_index;
+        for (int i = 0; i < nums.size(); ++i) {
+            if (num_index.count(target - nums[i]))
+                return {num_index[target - nums[i]], i};
+            num_index[nums[i]] = i;
+        }
+        return {};
+    }
+
+    // 454. 四数相加 II
+    int fourSumCount(vector<int> &nums1, vector<int> &nums2, vector<int> &nums3, vector<int> &nums4) {
+        unordered_map<int, int> sums;
+        for (const int &num1: nums1) {
+            for (const int &num2: nums2)
+                sums[num1 + num2]++;
+        }
+        int res = 0;
+        for (const int &num3: nums3) {
+            for (const int &num4: nums4) {
+                auto iter = sums.find(-(num3 + num4));
+                if (iter != sums.end())
+                    res += iter->second;
+            }
         }
         return res;
     }

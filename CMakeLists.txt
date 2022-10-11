@@ -7,9 +7,13 @@ include_directories(.)
 include_directories(linklist)
 include_directories(stackNqueue)
 
-add_executable(algorithm
+add_executable(test
         test.cpp)
 
 add_executable(hash
         hash/main.cpp
+        utils.h)
+
+add_executable(double_pointer
+        double_pointer/main.cpp
         utils.h)

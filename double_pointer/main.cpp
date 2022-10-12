@@ -46,7 +46,7 @@ class Solution {
 
     // 18. 四数之和
     // https://leetcode.cn/problems/4sum/
-    // 思路: 在三数之和的基础上加一层循环
+    // 思路: 在三数之和的基础上加一层循环，然后每个内循环求的三数之和是 target - num[i]
     vector<vector<int>> fourSum(vector<int> &nums, int target) {
         if (nums.size() < 4)
             return {};

@@ -17,3 +17,7 @@ add_executable(hash
 add_executable(double_pointer
         double_pointer/main.cpp
         utils.h)
+
+add_executable(tree
+        tree/main.cpp
+        utils.h)

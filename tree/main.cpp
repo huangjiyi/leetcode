@@ -570,50 +570,45 @@ class Solution {
         if (key < root->val) root->left = deleteNode(root->left, key);
         else if (key > root->val) root->right = deleteNode(root->right, key);
         else {
-            // 2. 待删除结点左右孩子均为空
             if (root->left == nullptr and root->right == nullptr) {
+                // 2. 待删除结点左右孩子均为空
                 delete root;
                 return nullptr;
-            }
-            // 4. 待删除结点左右孩子均不为空
-            if (root->left != nullptr and root->right != nullptr) {
-                TreeNode *_pre = root, *node = root->left;
-                // 找到左子树右下角（最大的结点）
-                while (node->right != nullptr) {
-                    _pre = node;
-                    node = node->right;
+            } else if (root->left != nullptr and root->right != nullptr) {
+                // 4. 待删除结点左右孩子均不为空
+                TreeNode *pre = root, *left_max = root->left;
+                // 找到左子树右下角 left_max（最大的结点）
+                while (left_max->right) {
+                    pre = left_max;
+                    left_max = left_max->right;
                 }
-                if (_pre != root) {
-                    _pre->right = node->left;
-                    root->val = node->val;
-                    delete node;
-                } else {
-                    root->val = node->val;
-                    root->left = node->left;
-                    delete node;
-                }
+                // 将待删除结点用左子树 left_max 替换，先将 root->val 替换为 left_max 的 val，然后删除 left_max
+                // 需要注意 left_max 可能有左子树但没有右子树，需要修改 left_max 父结点的的子树
+                root->val = left_max->val;
+                if (pre == root)
+                    root->left = left_max->left;
+                else
+                    pre->right = left_max->left;
+                delete left_max;
                 return root;
+            } else {
+                // 3. 待删除结点只有一个孩子为空, 直接用孩子取代
+                TreeNode *node = root->left ? root->left : root->right;
+                delete root;
+                return node;
             }
-            // 3. 待删除结点只有一个孩子为空, 直接用孩子取代
-            TreeNode *tmp;
-            if (root->left != nullptr)
-                tmp = root->left;
-            else
-                tmp = root->right;
-            delete root;
-            return tmp;
         }
         return root;
     }
 
     // 用指针规避几乎所有的条件判断
-    TreeNode* deleteNode2(TreeNode* root, int key) {
+    TreeNode *deleteNode2(TreeNode *root, int key) {
         TreeNode **p = &root; //指向待删除节点的指针
-        while(*p && (*p)->val != key)
+        while (*p && (*p)->val != key)
             p = (*p)->val < key ? &(*p)->right : &(*p)->left;
-        if(!*p) return root;
+        if (!*p) return root;
         TreeNode **t = &(*p)->right; //指向右树的最左空指针的指针（这里把左树合到右树，反之同理即可）
-        while(*t) t = &(*t)->left;
+        while (*t) t = &(*t)->left;
         *t = (*p)->left;
         TreeNode *node = *p;
         *p = (*p)->right;
@@ -622,7 +617,7 @@ class Solution {
     }
 
     // 669. 修剪二叉搜索树
-    void clearTree(TreeNode* root) {
+    void clearTree(TreeNode *root) {
         if (root == nullptr)
             return;
         clearTree(root->left);
@@ -630,17 +625,17 @@ class Solution {
         delete root;
     }
 
-    TreeNode* trimBST(TreeNode* root, int low, int high) {
+    TreeNode *trimBST(TreeNode *root, int low, int high) {
         if (root == nullptr) return nullptr;
         if (root->val < low) {
             clearTree(root->left);
             root->left = nullptr;
-            TreeNode* next = root->right;
+            TreeNode *next = root->right;
 //            delete root;  // 删除 root 的话还要把 root 父结点的孩子指针置空，比较麻烦
             return trimBST(next, low, high);
         } else if (root->val > high) {
             clearTree(root->right);
-            TreeNode* next = root->left;
+            TreeNode *next = root->left;
 //            delete root;
             return trimBST(next, low, high);
         } else {
@@ -651,7 +646,7 @@ class Solution {
     }
 
     // 108. 将有序数组转换为二叉搜索树
-    TreeNode* _sortedArrayToBST(vector<int>& nums, size_t begin, size_t end) {
+    TreeNode *_sortedArrayToBST(vector<int> &nums, size_t begin, size_t end) {
         if (begin == end) return nullptr;
         size_t root_idx = (begin + end) / 2;
         TreeNode *root = new TreeNode(nums[root_idx]);
@@ -660,14 +655,15 @@ class Solution {
         return root;
     }
 
-    TreeNode* sortedArrayToBST(vector<int>& nums) {
+    TreeNode *sortedArrayToBST(vector<int> &nums) {
         return _sortedArrayToBST(nums, 0, nums.size());
     }
 
     // 538. 把二叉搜索树转换为累加树
     // 思路：中序遍历（右中左）
     int sum;
-    void _convertBST(TreeNode* root) {
+
+    void _convertBST(TreeNode *root) {
         if (root->right)
             _convertBST(root->right);
         sum += root->val;
@@ -676,7 +672,7 @@ class Solution {
             _convertBST(root->left);
     }
 
-    TreeNode* convertBST(TreeNode* root) {
+    TreeNode *convertBST(TreeNode *root) {
         if (root == nullptr)
             return nullptr;
         sum = 0;

@@ -21,3 +21,7 @@ add_executable(double_pointer
 add_executable(tree
         tree/main.cpp
         utils.h)
+
+add_executable(back_tracking
+        back_tracking/main.cpp
+        utils.h)

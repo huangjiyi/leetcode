@@ -361,15 +361,83 @@ class Solution {
     vector<vector<int>> permuteUnique(vector<int> &nums) {
         res_47.clear();
         path_47.clear();
-        bool *used = new bool[nums.size()] {false};
+        bool *used = new bool[nums.size()]{false};
         std::sort(nums.begin(), nums.end());
         _permuteUnique(nums, used);
         delete[] used;
         return res_47;
     }
+
+    // 332.重新安排行程
+    // 题目没说明的地方: 会有重复的 ticket，但每个 ticket 都要只用一次
+    unordered_map<string, map<string, int>> tickets_map;
+    vector<string> itinerary;
+
+    bool _findItinerary(vector<vector<string>> &tickets) {
+        if (itinerary.size() == tickets.size() + 1) return true;
+        for (auto &next: tickets_map[itinerary.back()]) {
+            if (next.second == 0) continue;
+            itinerary.push_back(next.first);
+            next.second--;
+            if (_findItinerary(tickets)) return true;
+            next.second++;
+            itinerary.pop_back();
+        }
+        return false;
+    }
+
+    vector<string> findItinerary(vector<vector<string>> &tickets) {
+        // 记录航班映射
+        tickets_map.clear();
+        for (const auto &ticket: tickets)
+            tickets_map[ticket[0]][ticket[1]]++;
+        itinerary.clear();
+        itinerary.emplace_back("JFK");
+        _findItinerary(tickets);
+        return itinerary;
+    }
+
+    // 51. N 皇后
+    // 在 nxn 矩阵中放置 n 个皇后，要求每一行、每一列、每一个斜列都有且只有一个皇后
+    vector<vector<string>> res_queens;
+    vector<string> queens;
+    bool *col_used;  // 每一列是否有皇后, 一共 n 列
+    bool *left_used;  // 每一个左上斜列是否有皇后, 一共 2n-1 个斜列
+    bool *right_used;  // 每一个右上斜列是否有皇后, 一共 2n-1 个斜列
+
+    void _solveNQueens(const int &n, int row) {
+        if (row == n) {
+            res_queens.push_back(queens);
+            return;
+        }
+        for (int col = 0; col < n; ++col) {
+            // 关键: 当前行列坐标到斜列坐标的映射
+            if (col_used[col] or right_used[col + row] or left_used[col - row + n - 1]) continue;
+            col_used[col] = right_used[col + row] = left_used[col - row + n - 1] = true;
+            queens[row][col] = 'Q';
+            _solveNQueens(n, row + 1);
+            col_used[col] = right_used[col + row] = left_used[col - row + n - 1] = false;
+            queens[row][col] = '.';
+        }
+    }
+
+    vector<vector<string>> solveNQueens(int n) {
+        res_queens.clear();
+        queens.resize(n, string(n, '.'));
+        col_used = new bool[n]{false};
+        left_used = new bool[2 * n - 1]{false};
+        right_used = new bool[2 * n - 1]{false};
+        _solveNQueens(n, 0);
+        return res_queens;
+    }
 };
 
 
 int main() {
+    Solution solve;
+    for (int i = 1; i < 10; ++i) {
+        cout << solve.solveNQueens(i).size() << ',';
+    }
+
     return 1;
 }

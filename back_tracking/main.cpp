@@ -430,6 +430,64 @@ class Solution {
         _solveNQueens(n, 0);
         return res_queens;
     }
+
+    // 37. 解数独
+    bool row_num_used[9][9] = {false};
+    bool col_num_used[9][9] = {false};
+    bool block_num_used[3][3][9] = {false};
+
+    void nextPos(int &row, int &col) {
+        if (col == 8) {
+            col = 0;
+            row++;
+        } else {
+            col++;
+        }
+    }
+
+    void lastPos(int &row, int &col) {
+        if (col == 0) {
+            col = 8;
+            row--;
+        } else {
+            col--;
+        }
+    }
+
+    bool _solveSudoku(vector<vector<char>> &board, int row, int col) {
+        if (row == 9) return true;
+        if (board[row][col] != '.') {
+            nextPos(row, col);
+            return _solveSudoku(board, row, col);
+        }
+        for (int num = 0; num < 9; ++num) {
+            if (row_num_used[row][num] or col_num_used[col][num] or
+                block_num_used[row / 3][col / 3][num])
+                continue;
+            board[row][col] = char('1' + num);
+            row_num_used[row][num] = col_num_used[col][num] = block_num_used[row / 3][col / 3][num] = true;
+            nextPos(row, col);
+            if (_solveSudoku(board, row, col))
+                return true;
+            lastPos(row, col);
+            row_num_used[row][num] = col_num_used[col][num] = block_num_used[row / 3][col / 3][num] = false;
+            board[row][col] = '.';
+        }
+        return false;
+    }
+
+
+    void solveSudoku(vector<vector<char>> &board) {
+        for (int row = 0; row < 9; ++row) {
+            for (int col = 0; col < 9; ++col) {
+                if (board[row][col] != '.') {
+                    int num = board[row][col] - '1';
+                    row_num_used[row][num] = col_num_used[col][num] = block_num_used[row / 3][col / 3][num] = true;
+                }
+            }
+        }
+        _solveSudoku(board, 0, 0);
+    }
 };
 
 

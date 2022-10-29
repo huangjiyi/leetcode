@@ -24,4 +24,7 @@ add_executable(tree
 
 add_executable(back_tracking
         back_tracking/main.cpp
-        utils.h)
+        utils.h greedy/main.cpp)
+
+add_executable(greedy
+        utils.h greedy/main.cpp)

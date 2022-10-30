@@ -28,3 +28,6 @@ add_executable(back_tracking
 
 add_executable(greedy
         utils.h greedy/main.cpp)
+
+add_executable(dp
+        utils.h dynamic_programming/main.cpp)
